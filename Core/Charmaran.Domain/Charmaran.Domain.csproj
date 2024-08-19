@@ -5,4 +5,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Charmaran.Shared\Charmaran.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

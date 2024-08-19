@@ -1,3 +1,5 @@
+using System;
+
 namespace Charmaran.Domain.Common
 {
     public abstract class AuditableEntity

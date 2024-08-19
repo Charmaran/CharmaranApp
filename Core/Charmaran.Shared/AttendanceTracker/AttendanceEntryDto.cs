@@ -1,10 +1,9 @@
 using System;
-using Charmaran.Domain.Common;
 using Charmaran.Shared.AttendanceTracker.Enums;
 
-namespace Charmaran.Domain.Entities.AttendanceTracker
+namespace Charmaran.Shared.AttendanceTracker
 {
-    public class AttendanceEntry : AuditableEntity
+    public class AttendanceEntryDto
     {
         public int Id { get; set; }
         public int EmployeeId { get; set; }
