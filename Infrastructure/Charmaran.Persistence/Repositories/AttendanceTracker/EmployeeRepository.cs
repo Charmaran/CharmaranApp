@@ -132,5 +132,24 @@ namespace Charmaran.Persistence.Repositories.AttendanceTracker
 
             return employees;
         }
+
+        public async Task<bool> IsEmployeeNameUnique(string name)
+        {
+            try
+            {
+                return await this._dbContext.Employees.FirstOrDefaultAsync(e => e.Name.Equals(name)) == null;
+            }
+            catch (Exception e)
+            {
+                this._logger.LogError(e, $"SQL error checking if Employee name {name} is unique");
+            }
+
+            return true;
+        }
+
+        public async Task<bool> EmployeeExists(int id)
+        {
+            return await this.GetByIdAsync(id) == null;
+        }
     }
 }
