@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "Charmaran.CreateEmployee": {
+    "Charmaran.AttendanceTracker": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7030",
+      "commandLineArgs": "--port 7297",
       "launchBrowser": false
     }
   }

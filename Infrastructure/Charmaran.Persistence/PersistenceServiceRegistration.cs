@@ -1,6 +1,4 @@
-using Charmaran.Persistence.Contracts;
 using Charmaran.Persistence.Contracts.AttendanceTracker;
-using Charmaran.Persistence.Repositories;
 using Charmaran.Persistence.Repositories.AttendanceTracker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +13,9 @@ namespace Charmaran.Persistence
             //Register the DbContext
             services.AddDbContext<CharmaranDbContext>(options =>
             {
-                options.UseMySQL(configuration.GetConnectionString("DefaultConnection")!);
+                options.UseCosmos(configuration["CosmosDB:Endpoint"] ?? string.Empty, 
+                    configuration["CosmosDB:PrimaryKey"] ?? string.Empty,
+                    configuration["CosmosDB:Database"] ?? string.Empty);
             });
 
             //Register the repositories
