@@ -1,4 +1,4 @@
-namespace Charmaran.Shared.AttendanceTracker.Requests
+namespace Charmaran.Shared.AttendanceTracker.Requests.Employee
 {
     /// <summary>
     /// Request to create a new employee.
