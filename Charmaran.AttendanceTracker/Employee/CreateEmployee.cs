@@ -51,7 +51,17 @@ namespace Charmaran.AttendanceTracker.Employee
             }
             
             // Call the service
-            CreateEmployeeResponse response = await this._employeeService.CreateEmployeeAsync(body?.Name ?? string.Empty);
+            CreateEmployeeResponse response;
+            try
+            {
+               response = await this._employeeService.CreateEmployeeAsync(body?.Name ?? string.Empty);
+            }
+            catch (Exception e)
+            {
+                // Log the error and return an error response
+                this._logger.LogError(e, "Error creating employee");
+                return new BadRequestObjectResult("Error creating employee");
+            }
             
             // Return the result
             return new OkObjectResult(response);

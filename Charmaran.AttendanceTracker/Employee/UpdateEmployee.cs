@@ -26,6 +26,11 @@ namespace Charmaran.AttendanceTracker.Employee
             this._employeeService = employeeService;
         }
 
+        /// <summary>
+        /// Function that handles the HTTP request to update an employee.
+        /// </summary>
+        /// <param name="req">The HTTP request containing the update employee data.</param>
+        /// <returns>The HTTP response indicating the result of the update operation.</returns>
         [Function("UpdateEmployee")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequest req)
         {
@@ -46,7 +51,17 @@ namespace Charmaran.AttendanceTracker.Employee
             }
             
             //Call the service
-            UpdateEmployeeResponse response = await this._employeeService.UpdateEmployeeAsync(body?.Id ?? 0, body?.Name ?? string.Empty);
+            UpdateEmployeeResponse response;
+            try 
+            {
+                response = await this._employeeService.UpdateEmployeeAsync(body?.Id ?? 0, body?.Name ?? string.Empty);
+            }
+            catch (Exception e)
+            {
+                //Log the error and return an error response
+                _logger.LogError(e, "Error updating employee");
+                return new BadRequestObjectResult("Error updating employee");
+            }
             
             //Return the result
             return new OkObjectResult(response);
