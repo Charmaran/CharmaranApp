@@ -285,10 +285,17 @@ namespace Charmaran.Application.Services.AttendanceTracker
             return employeeDto;
         }
         
-        public async Task<List<EmployeeDto>> GetEmployeesAsync()
+        public async Task<GetAllEmployeesResponse> GetEmployeesAsync()
         {
             //Log the request
             this._logger.LogInformation("Getting all Employees");
+            
+            //Create the response
+            GetAllEmployeesResponse getAllEmployeesResponse = new GetAllEmployeesResponse
+            {
+                Success = true,
+                Message = "Employees Retrieved Successfully"
+            };
             
             //Get all employees
             IEnumerable<Employee>? allEmployees = await this._employeeRepository.ListAllAsync();
@@ -297,13 +304,15 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (allEmployees == null)
             {
                 this._logger.LogWarning("No employees found, returning empty list");
-                return new List<EmployeeDto>();
+                return getAllEmployeesResponse;
             }
             
             //Log and return the response
             this._logger.LogInformation("Returning response for all employees retrieval");
             allEmployees = allEmployees.OrderBy(e => e.Name).ToList();
-            return this._mapper.Map<List<EmployeeDto>>(allEmployees);
+            getAllEmployeesResponse.Employees = this._mapper.Map<List<EmployeeDto>>(allEmployees);
+            
+            return getAllEmployeesResponse;
         }
 
         public Task ExportEmployeesAsync()

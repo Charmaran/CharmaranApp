@@ -13,7 +13,7 @@ namespace Charmaran.Application.Contracts.AttendanceTracker
         Task<bool> PermanentDeleteEmployeeAsync(int id);
         Task<bool> RestoreEmployeeAsync(int id);
         Task<EmployeeDetailDto?> GetEmployeeByIdAsync(int id);
-        Task<List<EmployeeDto>> GetEmployeesAsync();
+        Task<GetAllEmployeesResponse> GetEmployeesAsync();
         Task ExportEmployeesAsync();
     }
 }
