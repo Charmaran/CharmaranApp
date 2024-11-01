@@ -4,8 +4,8 @@ using Charmaran.Shared.AttendanceTracker.Requests.Employee;
 using Charmaran.Shared.AttendanceTracker.Responses.Employee;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Charmaran.AttendanceTracker.Employee
 {
@@ -31,7 +31,7 @@ namespace Charmaran.AttendanceTracker.Employee
         /// <param name="req">The HTTP request containing the delete employee data.</param>
         /// <returns>The HTTP response indicating the result of the delete operation.</returns>
         [Function("DeleteEmployee")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "delete")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "delete")] HttpRequestData req)
         {
             //Log the request
             _logger.LogInformation("Handling request for deleting an employee...");
