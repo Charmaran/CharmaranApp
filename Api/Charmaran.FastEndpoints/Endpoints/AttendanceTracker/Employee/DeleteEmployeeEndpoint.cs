@@ -24,7 +24,7 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.Employee
         public override void Configure()
         {
             this.AllowAnonymous();
-            this.Delete("api/employee/delete");
+            this.Delete("api/employee");
             //this.Policies(PolicyNames._adminPolicy);
             this.Options(o => o.WithTags("Employee"));
         }

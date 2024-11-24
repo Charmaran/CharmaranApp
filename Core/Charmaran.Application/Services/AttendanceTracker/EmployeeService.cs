@@ -198,10 +198,17 @@ namespace Charmaran.Application.Services.AttendanceTracker
             return updateEmployeeResponse;
         }
         
-        public async Task<bool> PermanentDeleteEmployeeAsync(int id)
+        public async Task<PermanentDeleteEmployeeResponse> PermanentDeleteEmployeeAsync(int id)
         {
             //Log the request
             this._logger.LogInformation($"Permanently Deleting Employee with id: {id}");
+            
+            //Create the response
+            PermanentDeleteEmployeeResponse permanentDeleteEmployeeResponse = new PermanentDeleteEmployeeResponse
+            {
+                Success = true,
+                Message = "Employee Permanently Deleted Successfully"
+            };
             
             //Get the employee
             Employee? employee = await this._employeeRepository.GetByIdAsync(id);
@@ -210,7 +217,9 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (employee == null)
             {
                 this._logger.LogWarning($"Employee with id: {id} not found, returning failed response");
-                return false;
+                permanentDeleteEmployeeResponse.Success = false;
+                permanentDeleteEmployeeResponse.Message = "Employee Not Found";
+                return permanentDeleteEmployeeResponse;
             }
             
             //Delete the employee
@@ -221,11 +230,13 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (success == false)
             {
                 this._logger.LogWarning("Failed to permanently delete employee, returning failed response");
+                permanentDeleteEmployeeResponse.Success = false;
+                permanentDeleteEmployeeResponse.Message = "Failed to Permanently Delete Employee";
             }
             
             //Log and return the response
             this._logger.LogInformation("Returning response for employee permanent deletion");
-            return success;
+            return permanentDeleteEmployeeResponse;
         }
         
         public async Task<bool> RestoreEmployeeAsync(int id)
