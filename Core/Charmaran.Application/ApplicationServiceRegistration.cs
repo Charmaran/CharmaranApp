@@ -12,6 +12,7 @@ namespace Charmaran.Application
             AddSharedServices(services);
             
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IAttendanceEntryService, AttendanceEntryService>();
         }
         
         private static void AddSharedServices(this IServiceCollection services)

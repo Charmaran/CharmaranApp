@@ -1,3 +1,4 @@
+using Charmaran.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,8 @@ namespace Charmaran.FastEndpoints
                     options.EndpointFilter = (endpoint) => endpoint.EndpointTags == null;
                     options.AutoTagPathSegmentIndex = 0;
                 });
+            
+            services.AddAttendanceTrackerServices();
         }
     }
 }
