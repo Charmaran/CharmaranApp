@@ -239,10 +239,17 @@ namespace Charmaran.Application.Services.AttendanceTracker
             return permanentDeleteEmployeeResponse;
         }
         
-        public async Task<bool> RestoreEmployeeAsync(int id)
+        public async Task<RestoreEmployeeResponse> RestoreEmployeeAsync(int id)
         {
             //Log the request
             this._logger.LogInformation($"Restoring Employee with id: {id}");
+            
+            //Create the response
+            RestoreEmployeeResponse restoreEmployeeResponse = new RestoreEmployeeResponse
+            {
+                Success = true,
+                Message = "Employee Restore Successful"
+            };
             
             //Get the employee
             Employee? employee = await this._employeeRepository.GetByIdAsync(id);
@@ -251,7 +258,9 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (employee == null)
             {
                 this._logger.LogWarning($"Employee with id: {id} not found, returning failed response");
-                return false;
+                restoreEmployeeResponse.Success = false;
+                restoreEmployeeResponse.Message = "Employee Not Found";
+                return restoreEmployeeResponse;
             }
             
             //Restore the employee
@@ -267,11 +276,13 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (success == false)
             {
                 this._logger.LogWarning("Failed to restore employee, returning failed response");
+                restoreEmployeeResponse.Success = false;
+                restoreEmployeeResponse.Message = "Failed to Restore Employee";
             }
             
             //Log and return the response
             this._logger.LogInformation("Returning response for employee restoration");
-            return success;
+            return restoreEmployeeResponse;
         }
         
         public async Task<GetEmployeeResponse> GetEmployeeByIdAsync(int id)
