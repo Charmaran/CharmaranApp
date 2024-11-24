@@ -263,10 +263,18 @@ namespace Charmaran.Application.Services.AttendanceTracker
             return success;
         }
         
-        public async Task<EmployeeDetailDto?> GetEmployeeByIdAsync(int id)
+        public async Task<GetEmployeeResponse> GetEmployeeByIdAsync(int id)
         {
             //Log the request
             this._logger.LogInformation($"Getting Employee with id: {id}");
+            
+            //Create the response
+            GetEmployeeResponse getEmployeeResponse = new GetEmployeeResponse
+            {
+                Success = true,
+                Message = "Employee Retrieved Successfully",
+                Employee = null
+            };
             
             //Get the employee
             Employee? employee = await this._employeeRepository.GetByIdAsync(id);
@@ -275,14 +283,15 @@ namespace Charmaran.Application.Services.AttendanceTracker
             if (employee == null)
             {
                 this._logger.LogWarning($"Employee with id: {id} not found, returning null");
-                return null;
+                return getEmployeeResponse;
             }
 
             //Log and return the response
             this._logger.LogInformation("Returning response for employee retrieval");
             EmployeeDetailDto? employeeDto = this._mapper.Map<EmployeeDetailDto>(employee);
+            getEmployeeResponse.Employee = employeeDto;
             
-            return employeeDto;
+            return getEmployeeResponse;
         }
         
         public async Task<GetAllEmployeesResponse> GetEmployeesAsync()

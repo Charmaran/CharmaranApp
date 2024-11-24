@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Charmaran.Shared.AttendanceTracker;
 using Charmaran.Shared.AttendanceTracker.Responses.Employee;
 
 namespace Charmaran.Application.Contracts.AttendanceTracker
@@ -12,7 +10,7 @@ namespace Charmaran.Application.Contracts.AttendanceTracker
         Task<UpdateEmployeeResponse> UpdateEmployeeAsync(int id, string name);
         Task<bool> PermanentDeleteEmployeeAsync(int id);
         Task<bool> RestoreEmployeeAsync(int id);
-        Task<EmployeeDetailDto?> GetEmployeeByIdAsync(int id);
+        Task<GetEmployeeResponse> GetEmployeeByIdAsync(int id);
         Task<GetAllEmployeesResponse> GetEmployeesAsync();
         Task ExportEmployeesAsync();
     }
