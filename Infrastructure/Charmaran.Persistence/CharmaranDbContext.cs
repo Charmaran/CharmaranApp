@@ -53,7 +53,7 @@ namespace Charmaran.Persistence
                     }
                 )
                 .HasOne<Employee>()
-                .WithMany()
+                .WithMany(e => e.AttendanceEntries)
                 .HasForeignKey(a => a.EmployeeId)
                 .OnDelete(DeleteBehavior.Cascade);
             
@@ -74,6 +74,11 @@ namespace Charmaran.Persistence
                         );
                     }
                 );
+            
+        }
+        
+        private static void SeedData(ModelBuilder builder)
+        {
             
         }
     }

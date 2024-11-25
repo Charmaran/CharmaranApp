@@ -1,12 +1,15 @@
+using System;
 using Charmaran.Domain.Entities;
 using Charmaran.FastEndpoints;
 using Charmaran.Identity;
+using Charmaran.Persistence;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -39,6 +42,16 @@ builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddIdentityApiEndpoints<CharmaranUser>();
 
 WebApplication? app = builder.Build();
+
+// Initialize the database
+using (IServiceScope scope = app.Services.CreateScope())
+{
+	CharmaranDbContext dbContext = scope.ServiceProvider.GetRequiredService<CharmaranDbContext>();
+	RoleManager<IdentityRole<Guid>> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+	
+	DatabaseInitializer.MigrateDatabase(dbContext);
+	DatabaseInitializer.PostMigrationUpdates(dbContext, roleManager);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
