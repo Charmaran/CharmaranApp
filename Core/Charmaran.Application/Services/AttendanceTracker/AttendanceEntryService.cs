@@ -164,10 +164,10 @@ namespace Charmaran.Application.Services.AttendanceTracker
             return updateAttendanceEntryResponse;
         }
         
-        public async Task<DeleteAttendanceEntryResponse> DeleteAttendanceEntryAsync(AttendanceEntryDto attendanceEntryDto)
+        public async Task<DeleteAttendanceEntryResponse> DeleteAttendanceEntryAsync(int id)
         {
             //Log the request
-            this._logger.LogInformation($"Deleting attendance entry with id: {attendanceEntryDto.Id}");
+            this._logger.LogInformation($"Deleting attendance entry with id: {id}");
             
             //Create the response
             DeleteAttendanceEntryResponse deleteAttendanceEntryResponse = new DeleteAttendanceEntryResponse
@@ -176,8 +176,20 @@ namespace Charmaran.Application.Services.AttendanceTracker
                 Message = "Attendance Entry Deleted Successfully"
             };
             
+            //Get the attendance entry
+            AttendanceEntry? attendanceEntry = await this._attendanceEntryRepository.GetByIdAsync(id);
+            
+            //Attendance entry not found
+            if (attendanceEntry == null)
+            {
+                this._logger.LogWarning($"Attendance entry with id: {id} not found, returning failed response");
+                
+                deleteAttendanceEntryResponse.Success = false;
+                deleteAttendanceEntryResponse.Message = "Attendance Entry Not Found";
+                return deleteAttendanceEntryResponse;
+            }
+            
             //Delete the attendance entry
-            AttendanceEntry attendanceEntry = this._mapper.Map<AttendanceEntry>(attendanceEntryDto);
             bool success = await this._attendanceEntryRepository.DeleteAsync(attendanceEntry);
             
             //Attendance entry not deleted

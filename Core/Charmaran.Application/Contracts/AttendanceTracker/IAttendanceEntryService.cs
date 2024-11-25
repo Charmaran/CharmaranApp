@@ -8,7 +8,7 @@ namespace Charmaran.Application.Contracts.AttendanceTracker
     {
         Task<CreateAttendanceEntryResponse> CreateAttendanceEntryAsync(AttendanceEntryDto attendanceEntryDto);
         Task<UpdateAttendanceEntryResponse> UpdateAttendanceEntryAsync(AttendanceEntryDto attendanceEntryDto);
-        Task<DeleteAttendanceEntryResponse> DeleteAttendanceEntryAsync(AttendanceEntryDto attendanceEntryDto);
+        Task<DeleteAttendanceEntryResponse> DeleteAttendanceEntryAsync(int id);
         Task<GetEmployeeAttendanceEntriesResponse> GetEmployeeAttendanceEntriesAsync(int employeeId);
     }
 }

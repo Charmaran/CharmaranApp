@@ -10,6 +10,6 @@ namespace Charmaran.Shared.AttendanceTracker.Responses.Employee
         /// <summary>
         /// The collection of employees.
         /// </summary>
-        public IEnumerable<EmployeeDto> Employees { get; set; }
+        public IEnumerable<EmployeeDto>? Employees { get; set; }
     }
 }
