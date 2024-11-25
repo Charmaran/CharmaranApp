@@ -1,4 +1,6 @@
+using Charmaran.Domain.Entities;
 using Charmaran.FastEndpoints;
+using Charmaran.Identity;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
@@ -28,8 +30,13 @@ builder.Services.AddDataProtection()
 	});
 
 
+//Add Services
 builder.Services.AddControllers();
 builder.Services.AddFastEndpointServices(builder.Configuration);
+
+//Add Identity
+builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddIdentityApiEndpoints<CharmaranUser>();
 
 WebApplication? app = builder.Build();
 

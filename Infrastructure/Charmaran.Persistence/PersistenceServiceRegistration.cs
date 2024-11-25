@@ -13,9 +13,7 @@ namespace Charmaran.Persistence
             //Register the DbContext
             services.AddDbContext<CharmaranDbContext>(options =>
             {
-                options.UseCosmos(configuration["CosmosDB:Endpoint"] ?? string.Empty, 
-                    configuration["CosmosDB:PrimaryKey"] ?? string.Empty,
-                    configuration["CosmosDB:Database"] ?? string.Empty);
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
 
             //Register the repositories
