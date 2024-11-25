@@ -27,6 +27,7 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.AttendanceEntry
             this.Get("api/attendanceentry");
             //this.Policies(PolicyNames._generalPolicy);
             this.Options(o => o.WithTags("AttendanceEntry"));
+            this.Version(1);
         }
         
         public override async Task HandleAsync(GetEmployeeAttendanceEntriesApiRequest req, CancellationToken ct)

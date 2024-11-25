@@ -26,6 +26,7 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.Employee
             this.Get("api/employees/all");
             //this.Policies(PolicyNames._generalPolicy);
             this.Options(o => o.WithTags("Employee"));
+            this.Version(1);
         }
 
         public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)

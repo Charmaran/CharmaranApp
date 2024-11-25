@@ -27,6 +27,7 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.AttendanceEntry
             this.Delete("api/attendanceentry");
             //this.Policies(PolicyNames._generalPolicy);
             this.Options(o => o.WithTags("AttendanceEntry"));
+            this.Version(1);
         }
         
         public override async Task HandleAsync(DeleteAttendanceEntryApiRequest req, CancellationToken ct)
