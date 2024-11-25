@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Charmaran.Application.Contracts.AttendanceTracker;
-using Charmaran.Domain.Constants.Identity;
 using Charmaran.Shared.AttendanceTracker.Requests.Employee;
 using Charmaran.Shared.AttendanceTracker.Responses.Employee;
 using FastEndpoints;

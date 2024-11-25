@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddCors(policy =>
@@ -41,7 +41,7 @@ builder.Services.AddFastEndpointServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddIdentityApiEndpoints<CharmaranUser>();
 
-WebApplication? app = builder.Build();
+WebApplication app = builder.Build();
 
 // Initialize the database
 using (IServiceScope scope = app.Services.CreateScope())

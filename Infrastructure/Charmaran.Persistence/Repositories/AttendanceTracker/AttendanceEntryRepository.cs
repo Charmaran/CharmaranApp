@@ -61,7 +61,7 @@ namespace Charmaran.Persistence.Repositories.AttendanceTracker
 
         public async Task<bool> UpdateAsync(AttendanceEntry entity)
         {
-            int rowsAffected = 0;
+            int rowsAffected;
             
             await using (IDbContextTransaction transaction = await this._dbContext.Database.BeginTransactionAsync())
             {
@@ -98,7 +98,7 @@ namespace Charmaran.Persistence.Repositories.AttendanceTracker
 
         public async Task<bool> DeleteAsync(AttendanceEntry entity)
         {
-            int rowsAffected = 0;
+            int rowsAffected;
             
             await using (IDbContextTransaction transaction = await this._dbContext.Database.BeginTransactionAsync())
             {

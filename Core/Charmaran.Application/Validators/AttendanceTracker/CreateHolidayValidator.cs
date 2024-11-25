@@ -13,7 +13,8 @@ namespace Charmaran.Application.Validators.AttendanceTracker
                 .Must(date => date != default(DateTime)).WithMessage("{PropertyName} is required");
 
             RuleFor(h => h.Name)
-                .NotEmpty().WithMessage("{PropertyName} is required");
+                .NotEmpty().WithMessage("{PropertyName} is required")
+                .MaximumLength(100).WithMessage("{PropertyName} must be 100 characters or less");
         }
     }
 }
