@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <UserSecretsId>879a0a3f-f4a6-48ce-b084-e83d89a0d0b5</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Infrastructure\Charmaran.Identity\Charmaran.Identity.csproj" />
       <ProjectReference Include="..\Charmaran.FastEndpoints\Charmaran.FastEndpoints.csproj" />
     </ItemGroup>
 

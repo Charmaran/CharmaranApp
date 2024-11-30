@@ -1,7 +1,6 @@
-using System;
+using Charmaran.Domain.Constants.Identity;
 using Charmaran.Domain.Entities;
 using Charmaran.FastEndpoints;
-using Charmaran.Identity;
 using Charmaran.Persistence;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -19,7 +19,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(policy =>
 {
 	policy.AddPolicy("OpenCorsPolicy", opts =>
-		opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+		opts.AllowAnyOrigin()
+			.AllowAnyHeader()
+			.AllowAnyMethod()
 	);
 });
 
@@ -38,8 +40,26 @@ builder.Services.AddControllers();
 builder.Services.AddFastEndpointServices(builder.Configuration);
 
 //Add Identity
-builder.Services.AddIdentityServices(builder.Configuration);
-builder.Services.AddIdentityApiEndpoints<CharmaranUser>();
+builder.Services.AddAuthorization(options =>
+{
+	//Admin Only Policy
+	options.AddPolicy(PolicyNames._adminPolicy, policy => policy.RequireRole(RoleNames._admin));
+				
+	//General Access Policy
+	options.AddPolicy(PolicyNames._generalPolicy, policy => 
+		policy.RequireAssertion(context => context.User.IsInRole(RoleNames._admin) || context.User.IsInRole(RoleNames._user)));
+});
+
+builder.Services.AddIdentity<CharmaranUser, IdentityRole>(options =>
+	{
+		options.Password.RequiredLength = 9;
+		options.Password.RequireUppercase = true;
+		options.Password.RequireLowercase = true;
+		options.Password.RequireDigit = true;
+	})
+	.AddEntityFrameworkStores<CharmaranDbContext>()
+	.AddDefaultTokenProviders()
+	.AddApiEndpoints();
 
 WebApplication app = builder.Build();
 
@@ -47,21 +67,15 @@ WebApplication app = builder.Build();
 using (IServiceScope scope = app.Services.CreateScope())
 {
 	CharmaranDbContext dbContext = scope.ServiceProvider.GetRequiredService<CharmaranDbContext>();
-	RoleManager<IdentityRole<Guid>> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+	RoleManager<IdentityRole> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 	
 	DatabaseInitializer.MigrateDatabase(dbContext);
 	DatabaseInitializer.PostMigrationUpdates(dbContext, roleManager);
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseCors("OpenCorsPolicy");
 
+app.MapIdentityApi<CharmaranUser>();
 app.UseAuthentication();
 app.UseAuthorization();
 
