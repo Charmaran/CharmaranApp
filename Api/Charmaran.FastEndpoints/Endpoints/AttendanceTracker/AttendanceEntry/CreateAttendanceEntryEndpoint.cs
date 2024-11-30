@@ -45,7 +45,6 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.AttendanceEntry
             {
                 o.WithTags("AttendanceEntry");
             });
-            this.Version(1);
         }
 
         /// <summary>

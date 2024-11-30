@@ -41,7 +41,6 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.Employee
             this.AllowAnonymous();
             this.Put("api/employee/restore");
             this.Options(o => o.WithTags("Employee"));
-            this.Version(1);
         }
 
         /// <summary>

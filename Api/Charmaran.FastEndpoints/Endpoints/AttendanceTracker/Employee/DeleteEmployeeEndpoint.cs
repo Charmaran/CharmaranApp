@@ -42,7 +42,6 @@ namespace Charmaran.FastEndpoints.Endpoints.AttendanceTracker.Employee
             this.Delete("api/employee");
             //this.Policies(PolicyNames._adminPolicy);
             this.Options(o => o.WithTags("Employee"));
-            this.Version(1);
         }
         
         /// <summary>
