@@ -1,3 +1,4 @@
+using System;
 using Charmaran.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -29,7 +30,7 @@ namespace Charmaran.FastEndpoints
                         s.Description = "API documentation for the Charmaran application";
                     };
 
-                    options.EndpointFilter = ep => ep.EndpointTags == null;
+                    options.EndpointFilter = new Func<EndpointDefinition, bool>(ep => ep.EndpointTags == null);
                     options.AutoTagPathSegmentIndex = 0;
                 });
             
