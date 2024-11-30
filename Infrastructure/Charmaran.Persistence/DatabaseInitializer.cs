@@ -12,12 +12,12 @@ namespace Charmaran.Persistence
             dbContext.Database.Migrate();
         }
 
-        public static void PostMigrationUpdates(CharmaranDbContext dbContext, RoleManager<IdentityRole<Guid>> roleManager)
+        public static void PostMigrationUpdates(CharmaranDbContext dbContext, RoleManager<IdentityRole> roleManager)
         {
             // Add roles to the database
             if (roleManager.RoleExistsAsync(RoleNames._admin).Result == false)
             {
-                IdentityRole<Guid> role = new IdentityRole<Guid>
+                IdentityRole role = new IdentityRole
                 {
                     Name = RoleNames._admin
                 };
@@ -31,7 +31,7 @@ namespace Charmaran.Persistence
 
             if (roleManager.RoleExistsAsync(RoleNames._user).Result == false)
             {
-                IdentityRole<Guid> role = new IdentityRole<Guid>
+                IdentityRole role = new IdentityRole
                 {
                     Name = RoleNames._user
                 };

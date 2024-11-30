@@ -69,9 +69,11 @@ namespace Charmaran.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employees", x => x.Id);
-                    table.CheckConstraint("CHK_ECreatedDate", "CreatedDate <= LastModifiedDate");
-                    table.CheckConstraint("CHK_ELastModifiedDate", "LastModifiedDate IS NULL OR CreatedDate <= LastModifiedDate");
                 });
+
+            migrationBuilder.Sql(@"ALTER TABLE ""Employees"" ADD CONSTRAINT ""CHK_ECreatedDate"" CHECK (""CreatedDate"" <= ""LastModifiedDate"");");
+            migrationBuilder.Sql(@"ALTER TABLE ""Employees"" ADD CONSTRAINT ""CHK_ELastModifiedDate"" CHECK (""LastModifiedDate"" IS NULL OR ""CreatedDate"" <= ""LastModifiedDate"");");
+            
 
             migrationBuilder.CreateTable(
                 name: "Holidays",
@@ -79,7 +81,7 @@ namespace Charmaran.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -89,9 +91,10 @@ namespace Charmaran.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Holidays", x => x.Id);
-                    table.CheckConstraint("CHK_HCreatedDate", "CreatedDate <= LastModifiedDate");
-                    table.CheckConstraint("CHK_HLastModifiedDate", "LastModifiedDate IS NULL OR CreatedDate <= LastModifiedDate");
                 });
+            
+            migrationBuilder.Sql(@"ALTER TABLE ""Holidays"" ADD CONSTRAINT ""CHK_HCreatedDate"" CHECK (""CreatedDate"" <= ""LastModifiedDate"");");
+            migrationBuilder.Sql(@"ALTER TABLE ""Holidays"" ADD CONSTRAINT ""CHK_HLastModifiedDate"" CHECK (""LastModifiedDate"" IS NULL OR ""CreatedDate"" <= ""LastModifiedDate"");");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -218,8 +221,6 @@ namespace Charmaran.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AttendanceEntries", x => x.Id);
-                    table.CheckConstraint("CHK_AECreatedDate", "CreatedDate <= LastModifiedDate");
-                    table.CheckConstraint("CHK_AELastModifiedDate", "LastModifiedDate IS NULL OR CreatedDate <= LastModifiedDate");
                     table.ForeignKey(
                         name: "FK_AttendanceEntries_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -227,6 +228,9 @@ namespace Charmaran.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+            
+            migrationBuilder.Sql(@"ALTER TABLE ""AttendanceEntries"" ADD CONSTRAINT ""CHK_AECreatedDate"" CHECK (""CreatedDate"" <= ""LastModifiedDate"");");
+            migrationBuilder.Sql(@"ALTER TABLE ""AttendanceEntries"" ADD CONSTRAINT ""CHK_AELastModifiedDate"" CHECK (""LastModifiedDate"" IS NULL OR ""CreatedDate"" <= ""LastModifiedDate"");");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

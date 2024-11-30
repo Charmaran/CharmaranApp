@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Charmaran.Persistence.Migrations
 {
     [DbContext(typeof(CharmaranDbContext))]
-    [Migration("20241125015723_InitialMigration")]
+    [Migration("20241130003747_Initial Migration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -142,7 +142,8 @@ namespace Charmaran.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
