@@ -5,6 +5,7 @@ using Charmaran.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,9 +20,10 @@ namespace Charmaran.Api
             services.AddCors(policy =>
             {
                 policy.AddPolicy("CorsPolicy", opts =>
-                    opts.WithOrigins(["http://localhost:5168", "http://localhost:5168", "https://charmaran.codesmithing.io"])
+                    opts.WithOrigins("http://localhost:5168", "http://localhost:5168", "https://charmaran.codesmithing.io")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
+                        .AllowCredentials()
                 );
             });
 
@@ -42,29 +44,36 @@ namespace Charmaran.Api
             //Add Identity
             services.AddSecurity();
         }
-        
+
         private static void AddSecurity(this IServiceCollection services)
         {
-            services.AddAuthorization(options =>
+            // The default values, which are appropriate for hosting the Backend and
+            // BlazorWasmAuth apps on the same domain, are Lax and SameAsRequest. 
+            // https://learn.microsoft.com/aspnet/core/blazor/security/webassembly/standalone-with-identity#cross-domain-hosting-same-site-configuration
+            services.ConfigureApplicationCookie(options =>
             {
-                //Admin Only Policy
-                options.AddPolicy(PolicyNames._adminPolicy, policy => policy.RequireRole(RoleNames._admin));
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
+            
+            services.AddAuthentication(IdentityConstants.ApplicationScheme)
+                .AddIdentityCookies();
 
-                //General Access Policy
-                options.AddPolicy(PolicyNames._generalPolicy, policy =>
+            services.AddAuthorizationBuilder()
+                .AddPolicy(PolicyNames._adminPolicy, policy => policy.RequireRole(RoleNames._admin))
+                .AddPolicy(PolicyNames._generalPolicy, policy =>
                     policy.RequireAssertion(context =>
                         context.User.IsInRole(RoleNames._admin) || context.User.IsInRole(RoleNames._user)));
-            });
 
-            services.AddIdentity<CharmaranUser, IdentityRole>(options =>
+            services.AddIdentityCore<CharmaranUser>(options =>
                 {
                     options.Password.RequiredLength = 9;
                     options.Password.RequireUppercase = true;
                     options.Password.RequireLowercase = true;
                     options.Password.RequireDigit = true;
                 })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CharmaranDbContext>()
-                .AddDefaultTokenProviders()
                 .AddApiEndpoints();
         }
     }
