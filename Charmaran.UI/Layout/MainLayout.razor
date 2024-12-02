@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+<div class="page">
+    <div class="sidebar">
+        <NavMenu/>
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    Logged in as @context.User.Identity?.Name. <button class="btn btn-danger"><span class="bi bi-door-closed-fill" aria-hidden="true" style="vertical-align:middle"></span> Logout</button>
+                </Authorized>
+                <NotAuthorized>
+                    <button class="btn btn-primary"><span class="bi bi-door-open" aria-hidden="true" style="vertical-align:middle"></span> Login</button>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

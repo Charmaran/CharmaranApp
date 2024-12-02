@@ -1,16 +1,14 @@
 .navbar-toggler {
-    background-color: #21262d
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .top-row {
-    height: 3.5rem;
-    background-color: #21262d
+    min-height: 3.5rem;
+    background-color: rgba(0,0,0,0.4);
 }
 
 .navbar-brand {
     font-size: 1.1rem;
-    text-decoration: none;
-    align-content: center;
 }
 
 .bi {
@@ -37,37 +35,34 @@
 
 .nav-item {
     font-size: 0.9rem;
-    margin-top: 15px;
+    padding-bottom: 0.5rem;
 }
 
-.nav-item:first-of-type {
-    padding-top: 1rem;
-}
+    .nav-item:first-of-type {
+        padding-top: 1rem;
+    }
 
-.nav-item:last-of-type {
-    padding-bottom: 1rem;
-}
+    .nav-item:last-of-type {
+        padding-bottom: 1rem;
+    }
 
-.nav-item ::deep a {
-    color: #d7d7d7;
-    border-radius: 4px;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 0.5rem 0.5rem 1.5rem;
-    line-height: 3rem;
-}
-
-
+    .nav-item ::deep a {
+        color: #d7d7d7;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
 
 .nav-item ::deep a.active {
-    background-color: #238636;
-    color: #ffffff;
+    background-color: rgba(255,255,255,0.37);
+    color: white;
 }
 
 .nav-item ::deep a:hover {
-    background-color: #238636;
-    color: #ffffff;
+    background-color: rgba(255,255,255,0.1);
+    color: white;
 }
 
 @media (min-width: 641px) {
