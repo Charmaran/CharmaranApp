@@ -76,10 +76,5 @@ namespace Charmaran.Persistence
                 );
             
         }
-        
-        private static void SeedData(ModelBuilder builder)
-        {
-            
-        }
     }
 }
