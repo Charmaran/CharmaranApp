@@ -1,0 +1,46 @@
+@page "/Login"
+@using Blazored.Toast.Configuration
+
+<BlazoredToasts Position="ToastPosition.TopRight"
+                Timeout="10"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="done_outline"
+                ErrorIcon="fa fa-bug"/>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="login-form">
+                <h2 class="text-center mb-4">Login</h2>
+                @if (Errors.Any())
+                {
+                    foreach (string error in Errors)
+                    {
+                        <div class="alert alert-danger">@error</div>
+                    }
+                }
+                <div class="form-group">
+                    <label for="username" class="form-label h5">Username</label>
+                    <InputText type="text" id="username" name="username" class="form-control" placeholder="Enter your username" @bind-Value="UserName"/>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="password" class="form-label h5">Password</label>
+                    <InputText type="password" id="password" name="password" class="form-control" placeholder="Enter your password" @bind-Value="Password"/>
+                </div>
+
+                @if (this.IsProcessing)
+                {
+                    <button class="btn btn-primary form-control mt-3">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        Logging In
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-primary form-control mt-3" @onclick="LoginButton_Click">Login</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

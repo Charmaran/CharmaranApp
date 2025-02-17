@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.Modal" Version="7.3.1" />
+        <PackageReference Include="Blazored.Toast" Version="4.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all"/>
@@ -13,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Pages\Identity\" />
+      <ProjectReference Include="..\Core\Charmaran.Shared\Charmaran.Shared.csproj" />
     </ItemGroup>
 
 </Project>

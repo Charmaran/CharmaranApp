@@ -1,4 +1,7 @@
 using System;
+using System.Net.Http;
+using Blazored.Modal;
+using Blazored.Toast;
 using Charmaran.UI.Contracts;
 using Charmaran.UI.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -12,10 +15,17 @@ namespace Charmaran.UI
         public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSecurityServices(configuration);
+            
+            // Blazored Toast https://github.com/Blazored/Toast
+            services.AddBlazoredToast();
+            
+            // Blazored Modal https://github.com/Blazored/Modal
+            services.AddBlazoredModal();
         }
-
-        // Add Security Services using an example found at 
-        //https://github.com/dotnet/blazor-samples/tree/main/9.0/BlazorWebAssemblyStandaloneWithIdentity
+        
+        // Add Security Services using an example found at
+        // https://github.com/dotnet/blazor-samples/tree/main/9.0/BlazorWebAssemblyStandaloneWithIdentity
+        // https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/standalone-with-identity/?view=aspnetcore-9.0
         private static void AddSecurityServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ISecurityService, SecurityService>();
@@ -23,9 +33,12 @@ namespace Charmaran.UI
             services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
             services.AddTransient<AuthHeaderHandler>();
             
+            services.AddScoped(sp =>
+                new HttpClient { BaseAddress = new Uri(configuration["FrontendUrl"] ?? "https://localhost:5132") });
+            
             services.AddHttpClient(
                     "Auth",
-                    opt => opt.BaseAddress = new Uri(configuration["ApiUrl"] ?? "https://localhost:5032"))
+                    opt => opt.BaseAddress = new Uri(configuration["ApiUrl"] ?? "http://localhost:5032"))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
         }
     }

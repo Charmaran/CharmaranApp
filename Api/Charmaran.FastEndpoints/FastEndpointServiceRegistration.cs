@@ -30,7 +30,8 @@ namespace Charmaran.FastEndpoints
                         s.Description = "API documentation for the Charmaran application";
                     };
 
-                    options.EndpointFilter = new Func<EndpointDefinition, bool>(ep => ep.EndpointTags == null);
+                    //new Func<EndpointDefinition, bool>
+                    options.EndpointFilter = (ep => ep.EndpointTags == null);
                     options.AutoTagPathSegmentIndex = 0;
                 });
             

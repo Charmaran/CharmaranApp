@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -37,8 +38,8 @@ namespace Charmaran.UI.Identity
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            // default to not authenticated
             ClaimsPrincipal user = this._anonymous;
+            List<Claim> claims = new List<Claim>();
 
             try
             {
@@ -48,24 +49,27 @@ namespace Charmaran.UI.Identity
                 // throw if user info wasn't retrieved
                 userResponse.EnsureSuccessStatusCode();
 
-                // user is authenticated,so let's build their authenticated identity
+                // user is authenticated, so let's build their authenticated identity
                 string userJson = await userResponse.Content.ReadAsStringAsync();
                 UserInfo? userInfo = JsonSerializer.Deserialize<UserInfo>(userJson, this._jsonSerializerOptions);
-
+                
                 if (userInfo != null)
                 {
-                    // in this example app, name and email are the same
-                    List<Claim> claims = new List<Claim>
+                    // get additional claims
+                    HttpResponseMessage claimsResponse = await this._httpClient.GetAsync("/claims");
+                    claimsResponse.EnsureSuccessStatusCode();
+                    
+                    string claimsJson = await claimsResponse.Content.ReadAsStringAsync();
+                    
+                    Dictionary<string, string>? additionalClaims = JsonSerializer.Deserialize<Dictionary<string, string>>(claimsJson, this._jsonSerializerOptions);
+                    if (additionalClaims != null)
                     {
-                        new Claim(ClaimTypes.Name, userInfo.Email),
-                        new Claim(ClaimTypes.Email, userInfo.Email),
-                    };
-
-                    // add any additional claims
-                    claims.AddRange(
-                        userInfo.Claims.Where(c => c.Key != ClaimTypes.Name && c.Key != ClaimTypes.Email)
-                            .Select(c => new Claim(c.Key, c.Value)));
-
+                        foreach (KeyValuePair<string,string> additionalClaim in additionalClaims)
+                        {
+                            claims.Add(new Claim(additionalClaim.Key, additionalClaim.Value));
+                        }
+                    }
+                    
                     // request the roles endpoint for the user's roles
                     HttpResponseMessage rolesResponse = await this._httpClient.GetAsync("roles");
 
@@ -102,6 +106,17 @@ namespace Charmaran.UI.Identity
 
             // return the state
             return new AuthenticationState(user);
+        }
+        
+        public void NotifyUserAuthentication()
+        {
+            NotifyAuthenticationStateChanged(this.GetAuthenticationStateAsync());
+        }
+
+        public void NotifyUserLogout()
+        {
+            Task<AuthenticationState> authState = Task.FromResult(new AuthenticationState(this._anonymous));
+            NotifyAuthenticationStateChanged(authState);
         }
     }
 }

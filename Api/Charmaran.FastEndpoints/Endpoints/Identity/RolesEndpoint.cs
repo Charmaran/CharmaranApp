@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using FastEndpoints;
+using Microsoft.Extensions.Logging;
 
 namespace Charmaran.FastEndpoints.Endpoints.Identity
 {
@@ -11,6 +13,17 @@ namespace Charmaran.FastEndpoints.Endpoints.Identity
     /// </summary>
     public class RolesEndpoint : EndpointWithoutRequest
     {
+        private readonly ILogger<RolesEndpoint> _logger;
+
+        /// <summary>
+        /// Constructor for <see cref="RolesEndpoint"/>
+        /// </summary>
+        /// <param name="logger">The logger to use for logging information and errors.</param>
+        public RolesEndpoint(ILogger<RolesEndpoint> logger)
+        {
+            this._logger = logger;
+        }
+        
         /// <summary>
         /// Configures the endpoint.
         /// </summary>
@@ -32,24 +45,32 @@ namespace Charmaran.FastEndpoints.Endpoints.Identity
         /// </remarks>
         public override async Task HandleAsync(CancellationToken ct)
         {
-            ClaimsIdentity? identity = User.Identity as ClaimsIdentity;
-            if (identity == null)
+            try
             {
-                await this.SendUnauthorizedAsync(ct);
-                return;
-            }
-            
-            var roles = identity.FindAll(identity.RoleClaimType)
-                .Select(c => new
+                ClaimsIdentity? identity = User.Identity as ClaimsIdentity;
+                if (identity == null)
                 {
-                    c.Issuer,
-                    c.OriginalIssuer,
-                    c.Type,
-                    c.Value,
-                    c.ValueType
-                });
-
-            await this.SendAsync(roles, cancellation: ct);
+                    await this.SendUnauthorizedAsync(ct);
+                    return;
+                }
+            
+                var roles = identity.FindAll(identity.RoleClaimType)
+                    .Select(c => new
+                    {
+                        c.Issuer,
+                        c.OriginalIssuer,
+                        c.Type,
+                        c.Value,
+                        c.ValueType
+                    });
+                
+                await this.SendAsync(roles, cancellation: ct);
+            }
+            catch (Exception e)
+            {
+                this._logger.LogError(e, "Error getting roles");
+                await this.SendAsync(e.Message, 500, cancellation: ct);
+            }
         }
     }
 }

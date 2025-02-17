@@ -1,9 +1,11 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Charmaran.Domain.Entities;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Charmaran.FastEndpoints.Endpoints.Identity
 {
@@ -12,14 +14,17 @@ namespace Charmaran.FastEndpoints.Endpoints.Identity
     /// </summary>
     public class LogoutEndpoint : Endpoint<EmptyRequest>
     {
+        private readonly ILogger<LogoutEndpoint> _logger;
         private readonly SignInManager<CharmaranUser> _signInManager;
 
         /// <summary>
         /// Constructor for <see cref="LogoutEndpoint"/>.
         /// </summary>
+        /// <param name="logger">The logger to use for logging information and errors.</param>
         /// <param name="signInManager">The <see cref="SignInManager{TUser}"/> to use for signing out.</param>
-        public LogoutEndpoint(SignInManager<CharmaranUser> signInManager)
+        public LogoutEndpoint(ILogger<LogoutEndpoint> logger, SignInManager<CharmaranUser> signInManager)
         {
+            this._logger = logger;
             this._signInManager = signInManager;
         }
         
@@ -50,7 +55,17 @@ namespace Charmaran.FastEndpoints.Endpoints.Identity
         /// </remarks>
         public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
         {
-            await this._signInManager.SignOutAsync();
+            try
+            {
+                await this._signInManager.SignOutAsync();
+            }
+            catch (Exception e)
+            {
+                this._logger.LogError(e, "Error logging out");
+                await this.SendAsync(e.Message, 500, cancellation: ct);
+                return;
+            }
+            
             await this.SendOkAsync(ct);
         }
     }

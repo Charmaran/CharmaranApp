@@ -20,7 +20,7 @@ namespace Charmaran.Api
             services.AddCors(policy =>
             {
                 policy.AddPolicy("CorsPolicy", opts =>
-                    opts.WithOrigins("http://localhost:5168", "http://localhost:5168", "https://charmaran.codesmithing.io")
+                    opts.WithOrigins("https://localhost:5168", "http://localhost:5032", "http://localhost:5132", "https://charmaran.codesmithing.io")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
@@ -35,7 +35,7 @@ namespace Charmaran.Api
                     EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
                     ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
                 });
-
+            
 
             //Add Services
             services.AddControllers();
@@ -47,6 +47,9 @@ namespace Charmaran.Api
 
         private static void AddSecurity(this IServiceCollection services)
         {
+            services.AddAuthentication(IdentityConstants.ApplicationScheme)
+                .AddIdentityCookies();
+            
             // The default values, which are appropriate for hosting the Backend and
             // BlazorWasmAuth apps on the same domain, are Lax and SameAsRequest. 
             // https://learn.microsoft.com/aspnet/core/blazor/security/webassembly/standalone-with-identity#cross-domain-hosting-same-site-configuration
@@ -55,9 +58,6 @@ namespace Charmaran.Api
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
-            
-            services.AddAuthentication(IdentityConstants.ApplicationScheme)
-                .AddIdentityCookies();
 
             services.AddAuthorizationBuilder()
                 .AddPolicy(PolicyNames._adminPolicy, policy => policy.RequireRole(RoleNames._admin))
