@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Charmaran.Application.Contracts.AttendanceTracker;
@@ -8,6 +9,7 @@ using Charmaran.Domain.Entities.AttendanceTracker;
 using Charmaran.Persistence.Contracts.AttendanceTracker;
 using Charmaran.Shared.AttendanceTracker;
 using Charmaran.Shared.AttendanceTracker.Responses.AttendanceEntry;
+using Charmaran.Shared.Extensions;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 
@@ -57,6 +59,7 @@ namespace Charmaran.Application.Services.AttendanceTracker
             AttendanceEntry attendanceEntry = this._mapper.Map<AttendanceEntry>(attendanceEntryDto);
             attendanceEntry.CreatedBy = "system";
             attendanceEntry.CreatedDate = DateTime.UtcNow;
+            attendanceEntry.InputDate = attendanceEntry.InputDate.ConvertToUtc();
             
             //Validate the create request
             CreateAttendanceEntryValidator validator = new CreateAttendanceEntryValidator(this._employeeRepository);
@@ -233,8 +236,26 @@ namespace Charmaran.Application.Services.AttendanceTracker
             }
             
             //Get the attendance entries
-            IEnumerable<AttendanceEntry>? attendanceEntries = await this._attendanceEntryRepository.ListAsync(employeeId);
-            getEmployeeAttendanceEntriesResponse.AttendanceEntries = this._mapper.Map<List<AttendanceEntryDto>>(attendanceEntries);
+            AttendanceEntry[]? attendanceEntries = (await this._attendanceEntryRepository.ListAsync(employeeId))?.ToArray();
+            if (attendanceEntries == null)
+            {
+                this._logger.LogWarning($"No attendance entries found for employee with id: {employeeId}");
+                
+                return new GetEmployeeAttendanceEntriesResponse
+                {
+                    Success = true,
+                    Message = "No Attendance Entries Found"
+                };
+            }
+
+            // Convert to local time and map to dto
+            List<AttendanceEntryDto> attendanceEntriesList = new List<AttendanceEntryDto>();
+            foreach (AttendanceEntry attendanceEntry in attendanceEntries)
+            {
+                attendanceEntry.InputDate = attendanceEntry.InputDate.ConvertToLocalTime();
+                attendanceEntriesList.Add(this._mapper.Map<AttendanceEntryDto>(attendanceEntry));
+            }
+            getEmployeeAttendanceEntriesResponse.AttendanceEntries = attendanceEntriesList;
             
             //Return the response
             return getEmployeeAttendanceEntriesResponse;
