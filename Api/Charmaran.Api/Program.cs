@@ -21,9 +21,10 @@ using (IServiceScope scope = app.Services.CreateScope())
 {
 	CharmaranDbContext dbContext = scope.ServiceProvider.GetRequiredService<CharmaranDbContext>();
 	RoleManager<IdentityRole> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+	UserManager<CharmaranUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<CharmaranUser>>();
 	
 	DatabaseInitializer.MigrateDatabase(dbContext);
-	DatabaseInitializer.PostMigrationUpdates(dbContext, roleManager);
+	DatabaseInitializer.PostMigrationUpdates(dbContext, roleManager, userManager);
 }
 
 app.UseCors("CorsPolicy");

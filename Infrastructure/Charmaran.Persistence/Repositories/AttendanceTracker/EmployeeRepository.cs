@@ -149,7 +149,8 @@ namespace Charmaran.Persistence.Repositories.AttendanceTracker
 
         public async Task<bool> EmployeeExists(int id)
         {
-            return await this.GetByIdAsync(id) == null;
+            Employee? employee= await this.GetByIdAsync(id);
+            return employee != null;
         }
     }
 }

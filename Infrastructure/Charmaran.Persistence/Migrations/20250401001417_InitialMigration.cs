@@ -63,14 +63,14 @@ namespace Charmaran.Persistence.Migrations
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employees", x => x.Id);
                 });
-
+            
             migrationBuilder.Sql(@"ALTER TABLE ""Employees"" ADD CONSTRAINT ""CHK_ECreatedDate"" CHECK (""CreatedDate"" <= ""LastModifiedDate"");");
             migrationBuilder.Sql(@"ALTER TABLE ""Employees"" ADD CONSTRAINT ""CHK_ELastModifiedDate"" CHECK (""LastModifiedDate"" IS NULL OR ""CreatedDate"" <= ""LastModifiedDate"");");
             
@@ -85,14 +85,14 @@ namespace Charmaran.Persistence.Migrations
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Holidays", x => x.Id);
                 });
-            
+                        
             migrationBuilder.Sql(@"ALTER TABLE ""Holidays"" ADD CONSTRAINT ""CHK_HCreatedDate"" CHECK (""CreatedDate"" <= ""LastModifiedDate"");");
             migrationBuilder.Sql(@"ALTER TABLE ""Holidays"" ADD CONSTRAINT ""CHK_HLastModifiedDate"" CHECK (""LastModifiedDate"" IS NULL OR ""CreatedDate"" <= ""LastModifiedDate"");");
 
@@ -215,7 +215,7 @@ namespace Charmaran.Persistence.Migrations
                     Notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>

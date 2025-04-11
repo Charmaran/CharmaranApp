@@ -1,4 +1,3 @@
-using System;
 using Charmaran.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;

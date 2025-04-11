@@ -61,7 +61,13 @@ namespace Charmaran.Application.Services.AttendanceTracker
             else
             {
                 this._logger.LogInformation("Employee passed validation for creation, creating employee");
-                int newId = await this._employeeRepository.AddAsync(new Employee { Name = name });
+                
+                int newId = await this._employeeRepository.AddAsync(new Employee
+                {
+                    Name = name,
+                    CreatedBy = "system",
+                    CreatedDate = DateTime.UtcNow
+                });
                 
                 //Create failed send back failed message
                 if (newId == -1)
@@ -341,7 +347,7 @@ namespace Charmaran.Application.Services.AttendanceTracker
             //Log and return the response
             this._logger.LogInformation("Returning response for all employees retrieval");
             allEmployees = allEmployees.OrderBy(e => e.Name).ToList();
-            getAllEmployeesResponse.Employees = this._mapper.Map<List<EmployeeDto>>(allEmployees);
+            getAllEmployeesResponse.Employees = this._mapper.Map<List<EmployeeDto>>(allEmployees.ToList());
             
             return getAllEmployeesResponse;
         }

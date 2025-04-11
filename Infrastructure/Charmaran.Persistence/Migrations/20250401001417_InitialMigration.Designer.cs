@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Charmaran.Persistence.Migrations
 {
     [DbContext(typeof(CharmaranDbContext))]
-    [Migration("20241130003747_Initial Migration")]
+    [Migration("20250401001417_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -53,7 +53,6 @@ namespace Charmaran.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastModifiedDate")
@@ -94,7 +93,6 @@ namespace Charmaran.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastModifiedDate")
@@ -134,7 +132,6 @@ namespace Charmaran.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastModifiedDate")

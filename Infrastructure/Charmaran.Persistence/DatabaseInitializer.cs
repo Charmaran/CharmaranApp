@@ -1,5 +1,6 @@
 using System;
 using Charmaran.Domain.Constants.Identity;
+using Charmaran.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace Charmaran.Persistence
             dbContext.Database.Migrate();
         }
 
-        public static void PostMigrationUpdates(CharmaranDbContext dbContext, RoleManager<IdentityRole> roleManager)
+        public static void PostMigrationUpdates(CharmaranDbContext dbContext, RoleManager<IdentityRole> roleManager, UserManager<CharmaranUser> userManager)
         {
             // Add roles to the database
             if (roleManager.RoleExistsAsync(RoleNames._admin).Result == false)
