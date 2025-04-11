@@ -1,0 +1,15 @@
+meta {
+  name: GetEmployee
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:5032/api/employee?id=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  id: 3
+}

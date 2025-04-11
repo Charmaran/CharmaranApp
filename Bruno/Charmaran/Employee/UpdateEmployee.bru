@@ -1,0 +1,18 @@
+meta {
+  name: UpdateEmployee
+  type: http
+  seq: 6
+}
+
+put {
+  url: http://localhost:5032/api/employee/update
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 3,
+    "name": "Harold Smithy"
+  }
+}

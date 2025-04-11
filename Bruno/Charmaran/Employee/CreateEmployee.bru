@@ -1,0 +1,17 @@
+meta {
+  name: CreateEmployee
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5032/api/employee/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Harold Smith"
+  }
+}

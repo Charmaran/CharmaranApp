@@ -1,0 +1,15 @@
+meta {
+  name: GetAttendanceEntries
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:5032/api/attendanceentry?employeeId=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  employeeId: 3
+}

@@ -1,0 +1,24 @@
+meta {
+  name: UpdateAttendanceEntry
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:5032/api/attendanceentry
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "attendanceEntry": {
+      "id": 2,
+      "employeeId": 3,
+      "category": 3,
+      "amount": 1,
+      "inputDate": "2025-02-11T00:20:19.592Z",
+      "notes": ""
+    }
+  }
+}

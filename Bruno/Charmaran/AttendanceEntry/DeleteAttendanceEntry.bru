@@ -1,0 +1,17 @@
+meta {
+  name: DeleteAttendanceEntry
+  type: http
+  seq: 2
+}
+
+delete {
+  url: http://localhost:5032/api/attendanceentry
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 1
+  }
+}

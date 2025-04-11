@@ -1,0 +1,23 @@
+meta {
+  name: CreateAttendanceEntry
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5032/api/attendanceentry
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "attendanceEntry": {
+      "employeeId": 3,
+      "category": 1,
+      "amount": 1,
+      "inputDate": "2025-03-10",
+      "notes": ""
+    }
+  }
+}
