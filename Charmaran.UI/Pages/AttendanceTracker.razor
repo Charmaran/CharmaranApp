@@ -1,0 +1,135 @@
+@page "/AttendanceTracker"
+@attribute [Authorize]
+@using Blazored.Toast.Configuration
+@using Charmaran.Shared.AttendanceTracker
+@using Charmaran.UI.Components
+
+<BlazoredToasts Position="ToastPosition.TopRight"
+				Timeout="5"
+				IconType="IconType.FontAwesome"
+				SuccessClass="success-toast-override"
+				SuccessIcon="done_outline"
+				ErrorIcon="fa fa-bug"
+				WarningIcon="fa-solid fa-octagon-exclamation"
+				ShowProgressBar=true />
+
+@if (this.Employees == null)
+{
+	<LoadingIcon></LoadingIcon>
+}
+else
+{
+	<div class="container-fluid">
+		<div class="row">
+			<p class="text-lg-center h2">Attendance Tracker</p>
+		</div>
+		<div class="row">
+			<div class="col-6">
+				<div class="container">
+					<div class="row">
+						<label for="employeeSelect" class="form-label">Selected Employee:</label>
+						<select id="employeeSelect" class="form-select" name="selectedemployee" @bind="EmployeeIdModel">
+							<option value="-1"></option>
+							@if (this.Employees.Count > 0)
+							{
+								@foreach (EmployeeDto employee in this.Employees)
+								{
+									<option value="@employee.Id">@employee.Name</option>
+								}
+							}
+						</select>
+					</div>
+					<div class="row mt-2">
+						<button class="btn btn-primary btn-group-sm" @onclick="@ShowAddEmployeeModal">Add Employee</button>
+					</div>
+					<div class="row mt-2">
+						<div class="col-6">
+							<label class="form-label">Selected Year:</label>
+							<select class="form-select" name="selectedyear" @bind="YearModel">
+								@foreach (int year in this.Years)
+								{
+									<option value="@year">@year</option>
+								}
+							</select>
+						</div>
+						<div class="col-6">
+							<label class="form-label">Selected Month:</label>
+							<select class="form-select" name="selectedmonth" @bind="MonthModel">
+								@foreach (string month in Months)
+								{
+									<option value="@month">@month</option>
+								}
+							</select>
+						</div>
+					</div>
+					<div class="row mt-2">
+						<button type="button" class="btn btn-danger" @onclick="@On_RemoveEmployeeClick">Remove Employee</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-6 my-2">
+				<div class="row text-center">
+					<h4>Employee Statistics</h4>
+				</div>
+				<div class="row mx-1">
+					Late Points in Last 30 Days: @SelectedEmployee?.LatePoints30
+				</div>
+				<div class="row mx-1">
+					Late Points in Last 180 Days: @SelectedEmployee?.LatePoints180
+				</div>
+				<div class="row mx-1">
+					Left Early Points in Last 30 Days: @SelectedEmployee?.LeftEarlyPoints30
+				</div>
+				<div class="row mx-1">
+					Left Early Points in Last 180 Days: @SelectedEmployee?.LeftEarlyPoints180
+				</div>
+				<div class="row mx-1">
+					Un-Excused Absence Points in Last 30 Days: @SelectedEmployee?.UnExcusedAbsencePoints30
+				</div>
+				<div class="row mx-1">
+					Un-Excused Absence Points in Last 180 Days: @SelectedEmployee?.UnExcusedAbsencePoints180
+				</div>
+				<div class="row mx-1">
+					No Call No Show Points in Last 30 Days: @SelectedEmployee?.NoCallNoShowPoints30
+				</div>
+				<div class="row mx-1">
+					No Call No Show Points in Last 180 Days: @SelectedEmployee?.NoCallNoShowPoints180
+				</div>
+				<div class="row mx-1">
+					Total Points in Last 30 Days: @SelectedEmployee?.TotalPoints30Days
+				</div>
+				<div class="row mx-1">
+					Total Points in Last 180 Days: @SelectedEmployee?.TotalPoints180Days
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@foreach (int[][]? grid in this.Grids)
+			{
+				<Calender DayClicked="CalenderDayClicked" CalenderGrid="@grid" AttendanceEntries="@this.SelectedEmployee?.AttendanceEntries" Month="@ConvertMonthNameToInt(this.SelectedMonth)" Year="@this.SelectedYear"/>
+			}
+		</div>
+		<div class="row text-center mt-2">
+			<h2>Color Codes:</h2>
+
+			<div style="background-color:#ffff00" class="col text-center blank px-3 py-4">
+				Late
+			</div>
+			<div style="background-color:#ff8c00" class="col text-center blank px-3 py-4">
+				Left Early
+			</div>
+			<div style="background-color:#ff0000" class="col text-center align-self-center blank px-3 py-4">
+				Un-Excused Absence
+			</div>
+			<div style="background-color:#07e1ce" class="col text-center blank px-3 py-4">
+				Excused Absence
+			</div>
+			<div style="background-color:#05f705" class="col text-center blank px-3 py-4">
+				Vacation
+			</div>
+			<div style="background-color:#FC4923" class="col text-center blank px-3 py-4">
+				No Call No Show
+			</div>
+		</div>
+	</div>
+}

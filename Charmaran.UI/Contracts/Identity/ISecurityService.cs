@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Charmaran.UI.Identity.Models;
 
-namespace Charmaran.UI.Contracts
+namespace Charmaran.UI.Contracts.Identity
 {
     public interface ISecurityService
     {

@@ -1,0 +1,41 @@
+@using Charmaran.Shared.AttendanceTracker
+@using Charmaran.Shared.Extensions
+
+<div class="row">
+    <div class="col text-center border bg-secondary bg-gradient py-3">Sun</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Mon</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Tue</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Wed</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Thu</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Fri</div>
+    <div class="col text-center border bg-secondary bg-gradient py-3">Sat</div>
+</div>
+
+@for (int i = 0; i < 5; i++)
+{
+    <div class="row">
+        @for (int j = 0; j < 7; j++)
+        {
+            if (CalenderGrid[i][j] != 0)
+            {
+                IEnumerable<AttendanceEntryDto> entries = AttendanceEntries?.Where(x => x.InputDate.StartOfDay() == new DateTime(this.Year, this.Month, this.Day)).ToArray() ?? new AttendanceEntryDto[0];
+
+                if (entries.Any())
+                {
+                    <DateButton BackgroundColor="@ConvertEntryTypeToColor(entries.First().Category)" Day="this.Day" DayClicked="CallBackCalenderClick"/>
+                }
+                else
+                {
+                    <DateButton BackgroundColor="#ffffff" Day="this.Day" DayClicked="CallBackCalenderClick" />
+                }
+
+                this.Day++;
+            }
+            else
+            {
+                <div class="col blank border px-3 py-4">&nbsp;</div>
+            }
+        }
+    </div>
+
+}

@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Charmaran.Shared.Identity;
-using Charmaran.UI.Contracts;
+using Charmaran.UI.Contracts.Identity;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 

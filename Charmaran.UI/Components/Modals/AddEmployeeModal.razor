@@ -1,0 +1,14 @@
+
+<div class="simple-form mx-4">
+
+    <div class="row">
+        <label for="first-name">Name:</label>
+        <input @bind="Name" type="text" class="form-control" id="first-name" placeholder="Enter First Name" />
+    </div>
+
+    <div class="row mt-4">
+        <button @onclick="SubmitForm" class="btn btn-primary">Submit</button>
+        <button @onclick="Cancel" class="btn btn-secondary mt-2">Cancel</button>
+    </div>
+
+</div>

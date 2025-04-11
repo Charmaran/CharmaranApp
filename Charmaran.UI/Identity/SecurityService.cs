@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
-using Charmaran.UI.Contracts;
+using Charmaran.UI.Contracts.Identity;
 using Charmaran.UI.Identity.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 
