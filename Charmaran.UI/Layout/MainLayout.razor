@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -8,27 +8,28 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    @* <div class="row align-items-right"> *@
-                    @*     <div class="col-md-6"> *@
-                    @*         . *@
-                    @*     </div> *@
-                    @*     <div class="col-md-6"> *@
-                    @*          *@
-                    @*     </div> *@
-                    @* </div> *@
                     <div class="right-section d-flex align-items-center">
-                        <span class="me-5">Logged in as @FullName</span>
-                        <button class="btn btn-danger" @onclick="LogoutButton_Click"><span class="bi bi-door-closed-fill" aria-hidden="true" style="vertical-align:middle"></span> Logout</button>
+                        <div class="user-info me-4">
+                            <span class="user-name">@FullName</span>
+                            <span class="user-role">Employee</span>
+                        </div>
+                        <button class="btn btn-outline-danger" @onclick="LogoutButton_Click">
+                            <i class="bi bi-box-arrow-right me-1"></i> Logout
+                        </button>
                     </div>
                 </Authorized>
                 <NotAuthorized>
-                    <button class="btn btn-primary" @onclick="LoginButton_Click"><span class="bi bi-door-open" aria-hidden="true" style="vertical-align:middle"></span> Login</button>
+                    <button class="btn btn-primary" @onclick="LoginButton_Click">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                    </button>
                 </NotAuthorized>
             </AuthorizeView>
         </div>
 
-        <article class="content px-4">
-            @Body
+        <article class="content px-4 fade-in">
+            <div class="content-container">
+                @Body
+            </div>
         </article>
     </main>
 </div>

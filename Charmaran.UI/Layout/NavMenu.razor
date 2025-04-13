@@ -1,22 +1,25 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Charmaran Company</a>
+        <a class="navbar-brand" href="">
+            <span class="brand-name">Charmaran</span>
+            <span class="brand-subtitle">Company</span>
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+            <i class="bi bi-list"></i>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
+<div class="@NavMenuCssClass nav-scrollable">
+    <nav class="flex-column">
+        <div class="nav-item">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <i class="bi bi-house-door-fill nav-icon"></i> <span class="nav-text">Home</span>
             </NavLink>
         </div>
-        <div class="nav-item px-3">
+        <div class="nav-item">
             <NavLink class="nav-link" href="AttendanceTracker">
-                <span class="oi oi-people" aria-hidden="true"></span> Attendance Tracker
+                <i class="bi bi-calendar-check nav-icon"></i> <span class="nav-text">Attendance Tracker</span>
             </NavLink>
         </div>
     </nav>
@@ -31,5 +34,4 @@
     {
         _collapseNavMenu = !_collapseNavMenu;
     }
-
 }
