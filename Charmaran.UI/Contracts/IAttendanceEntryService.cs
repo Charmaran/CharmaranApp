@@ -8,9 +8,9 @@ namespace Charmaran.UI.Contracts
 {
     public interface IAttendanceEntryService
     {
-        Task<IEnumerable<AttendanceEntryDto>> GetAttendanceEntries(int employeeId, int year);
+        Task<GetEmployeeAttendanceEntriesResponse> GetAttendanceEntries(int employeeId, int year);
         Task<CreateAttendanceEntryResponse> AddAttendanceEntry(AttendanceEntryModel entry);
-        Task<bool> DeleteAttendanceEntry(int id);
+        Task<DeleteAttendanceEntryResponse> DeleteAttendanceEntry(int id);
         Task<UpdateAttendanceEntryResponse> UpdateAttendanceEntry(AttendanceEntryDto entry);
     }
 }

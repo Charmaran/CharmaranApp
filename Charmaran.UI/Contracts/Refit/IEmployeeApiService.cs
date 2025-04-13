@@ -9,10 +9,10 @@ namespace Charmaran.UI.Contracts.Refit
     public interface IEmployeeApiService
     {
         [Get("/api/employees/all")]
-        public Task<ApiResponse<List<EmployeeDto>>> GetEmployees();
+        public Task<ApiResponse<GetAllEmployeesResponse>> GetEmployees();
 
         [Get("/api/employee?id={employeeId}")]
-        public Task<ApiResponse<EmployeeDetailDto?>> GetEmployee(int employeeId);
+        public Task<ApiResponse<GetEmployeeResponse>> GetEmployee(int employeeId);
 
         [Post("/api/employee/create")]
         public Task<ApiResponse<CreateEmployeeResponse>> AddEmployee([Body] string name);

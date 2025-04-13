@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Charmaran.Shared.AttendanceTracker;
 using Charmaran.Shared.AttendanceTracker.Responses.Employee;
@@ -18,29 +19,32 @@ namespace Charmaran.UI.Services
         {
             this._employeeApiService = employeeApiService;
         }
-        public async Task<List<EmployeeDto>> GetEmployees(bool includeDeleted)
+        public async Task<GetAllEmployeesResponse> GetEmployees(bool includeDeleted)
         {
-            ApiResponse<List<EmployeeDto>> response = await this._employeeApiService.GetEmployees();
+            ApiResponse<GetAllEmployeesResponse> response = await this._employeeApiService.GetEmployees();
 
-            return response.IsSuccessStatusCode ? response.Content! : new List<EmployeeDto>();
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content!;
+            }
+            
+            return string.IsNullOrEmpty(response.Error.Content) ? 
+                new GetAllEmployeesResponse { Success = false, Message = "Unexpected Error Occurred" } 
+                : JsonConvert.DeserializeObject<GetAllEmployeesResponse>(response.Error.Content)!;
         }
 
-        public async Task<EmployeeDetailed?> GetEmployee(int employeeId)
+        public async Task<GetEmployeeResponse> GetEmployee(int employeeId)
         {
-            ApiResponse<EmployeeDetailDto?> response = await this._employeeApiService.GetEmployee(employeeId);
+            ApiResponse<GetEmployeeResponse> response = await this._employeeApiService.GetEmployee(employeeId);
 
-            if (response.IsSuccessStatusCode == false)
+            if (response.IsSuccessStatusCode)
             {
-                return null;
+                return response.Content!;
             }
-
-            return new EmployeeDetailed
-            {
-                Id = response.Content!.Id,
-                Name = response.Content.Name!,
-                IsDeleted = response.Content.IsDeleted,
-                AttendanceEntries = response.Content.AttendanceEntries
-            };
+			
+            return string.IsNullOrEmpty(response.Error.Content) ? 
+                new GetEmployeeResponse { Success = false, Message = "Unexpected Error Occurred" } 
+                : JsonConvert.DeserializeObject<GetEmployeeResponse>(response.Error.Content)!;
         }
 
         public async Task<CreateEmployeeResponse> AddEmployee(string name)

@@ -130,6 +130,7 @@ namespace Charmaran.Application.Services.AttendanceTracker
             AttendanceEntry attendanceEntry = this._mapper.Map<AttendanceEntry>(attendanceEntryDto);
             attendanceEntry.LastModifiedBy = "system";
             attendanceEntry.LastModifiedDate = DateTime.UtcNow;
+            attendanceEntry.InputDate = attendanceEntry.InputDate.ConvertToUtc();
             
             //Validate the update request
             UpdateAttendanceEntryValidator validator = new UpdateAttendanceEntryValidator(this._employeeRepository);

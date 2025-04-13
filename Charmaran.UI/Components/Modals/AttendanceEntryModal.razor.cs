@@ -3,6 +3,7 @@ using Blazored.Modal;
 using Blazored.Modal.Services;
 using Charmaran.Shared.AttendanceTracker.Enums;
 using Charmaran.UI.Models;
+using Charmaran.UI.Models.Enums;
 using Microsoft.AspNetCore.Components;
 
 namespace Charmaran.UI.Components.Modals
@@ -83,8 +84,9 @@ namespace Charmaran.UI.Components.Modals
                         break;
                 }
 
-                NewEntry = new AttendanceEntryModel()
+                NewEntry = new AttendanceEntryModel
                 {
+                    CustomModalResult = ExistingEntry == null ? CustomModalResult.Create : CustomModalResult.Update,
                     Category = category,
                     Amount = amount,
                     InputDate = DateSelected,
@@ -97,7 +99,10 @@ namespace Charmaran.UI.Components.Modals
 
         private void SubmitDelete()
         {
-            ModalInstance.CloseAsync(ModalResult.Ok(new AttendanceEntryModel()));
+            ModalInstance.CloseAsync(ModalResult.Ok(new AttendanceEntryModel
+            {
+                CustomModalResult = CustomModalResult.Delete
+            }));
         }
 
         private void Cancel()

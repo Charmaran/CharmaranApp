@@ -7,10 +7,12 @@ using Blazored.Modal.Services;
 using Blazored.Toast.Services;
 using Charmaran.Shared.AttendanceTracker;
 using Charmaran.Shared.AttendanceTracker.Enums;
+using Charmaran.Shared.AttendanceTracker.Responses.AttendanceEntry;
 using Charmaran.Shared.AttendanceTracker.Responses.Employee;
 using Charmaran.UI.Components.Modals;
 using Charmaran.UI.Contracts;
 using Charmaran.UI.Models;
+using Charmaran.UI.Models.Enums;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -96,7 +98,18 @@ namespace Charmaran.UI.Pages
             this.SelectedMonth = Months[DateTime.Now.Month - 1];
 
             SetupYears();
-            this.Employees = await this.EmployeeService.GetEmployees(false);
+
+            GetAllEmployeesResponse getAllEmployeesResponse = await this.EmployeeService.GetEmployees(false);
+            if (getAllEmployeesResponse.Success)
+            {
+                this.Employees = getAllEmployeesResponse.Employees!.ToList();
+            }
+            else
+            {
+                this.ToastService.ShowError(getAllEmployeesResponse.Message ?? "Unexpected Error Occurred");
+                return;
+            }
+
             this.Grids.Add(CreateCalenderGrid());
         }
 
@@ -206,7 +219,18 @@ namespace Charmaran.UI.Pages
                 else
                 {
                     this.ToastService.ShowSuccess("Employee Added Successfully");
-                    this.Employees = await this.EmployeeService.GetEmployees(false);
+
+                    GetAllEmployeesResponse getAllEmployeesResponse = await this.EmployeeService.GetEmployees(false);
+
+                    if (getAllEmployeesResponse.Success)
+                    {
+                        this.Employees = getAllEmployeesResponse.Employees!.ToList();
+                    }
+                    else
+                    {
+                        this.ToastService.ShowError(getAllEmployeesResponse.Message ?? "Unexpected Error Occurred");
+                        return;
+                    }
 
                     //Update selected employee to newly added employee
                     EmployeeDto tempEmployee = this.Employees.First(e => e.Id == response.EmployeeDto?.Id);
@@ -218,10 +242,11 @@ namespace Charmaran.UI.Pages
             }
         }
 
-        private async void On_RemoveEmployeeClick()
+        private async Task On_RemoveEmployeeClick()
         {
             if (this.SelectedEmployee == null)
             {
+                this.ToastService.ShowWarning("No Employee Selected to Delete");
                 return;
             }
 
@@ -237,95 +262,125 @@ namespace Charmaran.UI.Pages
             if (result.Cancelled)
             {
                 Console.WriteLine("Modal was cancelled");
+                return;
             }
-            else
+
+            DeleteEmployeeResponse response = await this.EmployeeService.DeleteEmployee(this.SelectedEmployee.Id);
+            if (response.Success == false)
             {
-                DeleteEmployeeResponse response =
-                    await this.EmployeeService.DeleteEmployee(this.SelectedEmployee.Id);
-                if (response.Success == false)
+                if (response.Success == false && string.Equals(response.Message,
+                        "Employee failed to delete, no such employee exists"))
                 {
-                    if (response.Success == false && string.Equals(response.Message,
-                            "Employee failed to delete, no such employee exists"))
-                    {
-                        this.ToastService.ShowWarning("Employee Not Found");
-                        this.SelectedEmployee = null;
-                        await ResetEmployeeSelect();
-                    }
-                    else
-                    {
-                        this.ToastService.ShowError("Unexpected Error");
-                    }
+                    this.ToastService.ShowWarning("Employee Not Found");
+                    this.SelectedEmployee = null;
+                    await ResetEmployeeSelect();
                 }
                 else
                 {
-                    this.ToastService.ShowSuccess("Employee Successfully Deleted");
-                    this.Employees = await this.EmployeeService.GetEmployees(false);
-                    this.SelectedEmployee = null;
-
-                    await ResetEmployeeSelect();
-                    ReCreateCalender();
+                    this.ToastService.ShowError("Unexpected Error");
                 }
+
+                return;
             }
+
+            this.ToastService.ShowSuccess("Employee Successfully Deleted");
+
+            GetAllEmployeesResponse getAllEmployeesResponse = await this.EmployeeService.GetEmployees(false);
+
+            if (getAllEmployeesResponse.Success == false)
+            {
+                this.ToastService.ShowError(getAllEmployeesResponse.Message ?? "Unexpected Error Occurred");
+                return;
+            }
+
+            this.Employees = getAllEmployeesResponse.Employees!.ToList();
+            this.SelectedEmployee = null;
+            await ResetEmployeeSelect();
+            ReCreateCalender();
         }
 
         private async Task OnSelectedEmployeeChange(int newValue)
         {
-            if (newValue > 0)
-            {
-                this.SelectedEmployee = await this.EmployeeService.GetEmployee(newValue);
-                if (this.SelectedEmployee != null)
-                {
-                    this.SelectedEmployee.AttendanceEntries =
-                        (List<AttendanceEntryDto>)await this.AttendanceEntryService.GetAttendanceEntries(
-                            this.SelectedEmployee.Id, this.SelectedYear);
-                }
-
-                UpdateEmployeeStatistics();
-            }
-            else
+            if (newValue <= 0) 
             {
                 this.SelectedEmployee = null;
+                ReCreateCalender();
+                return;
+            }
+            
+            GetEmployeeResponse getEmployeeResponse = await this.EmployeeService.GetEmployee(newValue);
+
+            if (getEmployeeResponse.Success == false)
+            {
+                this.SelectedEmployee = null;
+                this.ToastService.ShowError("Unexpected Error Occured");
+                return;
             }
 
+            this.SelectedEmployee = new EmployeeDetailed
+            {
+                Id = getEmployeeResponse.Employee!.Id,
+                Name = getEmployeeResponse.Employee.Name!,
+                AttendanceEntries = new List<AttendanceEntryDto>(),
+                IsDeleted = getEmployeeResponse.Employee.IsDeleted
+            };
+
+            if (this.SelectedEmployee != null)
+            {
+                GetEmployeeAttendanceEntriesResponse employeeAttendanceEntriesResponse = await this.AttendanceEntryService.GetAttendanceEntries(this.SelectedEmployee.Id, this.SelectedYear);
+                        
+                if (employeeAttendanceEntriesResponse.Success == false)
+                {
+                    this.SelectedEmployee = null;
+                    this.ToastService.ShowError(employeeAttendanceEntriesResponse.Message!);
+                    return;
+                }
+                    
+                this.SelectedEmployee.AttendanceEntries = employeeAttendanceEntriesResponse.AttendanceEntries!.ToList();
+            }
+
+            UpdateEmployeeStatistics();
             ReCreateCalender();
         }
 
         private void UpdateEmployeeStatistics()
         {
-            if (this.SelectedEmployee != null)
+            if (this.SelectedEmployee == null)
             {
-                //30 Day values
-                this.SelectedEmployee.LatePoints30 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
-                                x.Category == AttendanceEntryCategory.Late).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.LeftEarlyPoints30 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
-                                x.Category == AttendanceEntryCategory.LeftEarly).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.UnExcusedAbsencePoints30 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
-                                x.Category == AttendanceEntryCategory.UnexcusedAbsence).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.NoCallNoShowPoints30 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
-                                x.Category == AttendanceEntryCategory.NoCallNoShow).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.TotalPoints30Days = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-30)).Select(x => x.Amount).Sum();
-
-                //180 Day values
-                this.SelectedEmployee.LatePoints180 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
-                                x.Category == AttendanceEntryCategory.Late).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.LeftEarlyPoints180 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
-                                x.Category == AttendanceEntryCategory.LeftEarly).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.UnExcusedAbsencePoints180 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
-                                x.Category == AttendanceEntryCategory.UnexcusedAbsence).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.NoCallNoShowPoints180 = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
-                                x.Category == AttendanceEntryCategory.NoCallNoShow).Select(x => x.Amount).Sum();
-                this.SelectedEmployee.TotalPoints180Days = this.SelectedEmployee.AttendanceEntries
-                    .Where(x => x.InputDate >= DateTime.Today.AddDays(-180)).Select(x => x.Amount).Sum();
+                return;
             }
+
+            //30 Day values
+            this.SelectedEmployee.LatePoints30 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
+                            x.Category == AttendanceEntryCategory.Late).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.LeftEarlyPoints30 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
+                            x.Category == AttendanceEntryCategory.LeftEarly).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.UnExcusedAbsencePoints30 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
+                            x.Category == AttendanceEntryCategory.UnexcusedAbsence).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.NoCallNoShowPoints30 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-30) &&
+                            x.Category == AttendanceEntryCategory.NoCallNoShow).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.TotalPoints30Days = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-30)).Select(x => x.Amount).Sum();
+
+            //180 Day values
+            this.SelectedEmployee.LatePoints180 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
+                            x.Category == AttendanceEntryCategory.Late).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.LeftEarlyPoints180 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
+                            x.Category == AttendanceEntryCategory.LeftEarly).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.UnExcusedAbsencePoints180 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
+                            x.Category == AttendanceEntryCategory.UnexcusedAbsence).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.NoCallNoShowPoints180 = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-180) &&
+                            x.Category == AttendanceEntryCategory.NoCallNoShow).Select(x => x.Amount).Sum();
+            this.SelectedEmployee.TotalPoints180Days = this.SelectedEmployee.AttendanceEntries
+                .Where(x => x.InputDate >= DateTime.Today.AddDays(-180)).Select(x => x.Amount).Sum();
         }
 
         private void ReCreateCalender()
@@ -346,72 +401,111 @@ namespace Charmaran.UI.Pages
             ReCreateCalender();
         }
 
-        private async void CalenderDayClicked(CalenderItem date)
+        private async Task CalenderDayClicked(CalenderItem date)
         {
-            if (this.SelectedEmployee != null)
+            if (this.SelectedEmployee == null)
             {
-                ModalParameters parameters = new ModalParameters();
-                IEnumerable<AttendanceEntryDto> entries = this.SelectedEmployee.AttendanceEntries.Where(x =>
-                    x.InputDate == new DateTime(date.Year, date.Month, date.Day));
-                int id = -1;
-                AttendanceEntryDto? existingEntry = null;
+                this.ToastService.ShowWarning("Please select an employee");
+                return;
+            }
 
-                IEnumerable<AttendanceEntryDto> attendanceEntryDtos = entries.ToList();
-                if (attendanceEntryDtos.Any())
+            ModalParameters parameters = new ModalParameters();
+            IEnumerable<AttendanceEntryDto> entries = this.SelectedEmployee.AttendanceEntries.Where(x =>
+                x.InputDate == new DateTime(date.Year, date.Month, date.Day));
+            int id = -1;
+            AttendanceEntryDto? existingEntry = null;
+
+            IEnumerable<AttendanceEntryDto> attendanceEntryDtos = entries.ToList();
+            if (attendanceEntryDtos.Any())
+            {
+                existingEntry = attendanceEntryDtos.First();
+                id = existingEntry.Id;
+
+                parameters.Add(nameof(AttendanceEntryModal.ExistingEntry), new AttendanceEntryModel
                 {
-                    existingEntry = attendanceEntryDtos.First();
-                    id = existingEntry.Id;
+                    Category = existingEntry.Category,
+                    Amount = existingEntry.Amount,
+                    InputDate = existingEntry.InputDate,
+                    Notes = existingEntry.Notes
+                });
+            }
 
-                    parameters.Add(nameof(AttendanceEntryModal.ExistingEntry), new AttendanceEntryModel
-                    {
-                        Category = existingEntry.Category,
-                        Amount = existingEntry.Amount,
-                        InputDate = existingEntry.InputDate,
-                        Notes = existingEntry.Notes
-                    });
+            parameters.Add(nameof(AttendanceEntryModal.DateSelected),
+                new DateTime(date.Year, date.Month, date.Day));
+
+            IModalReference formModal = Modal.Show<AttendanceEntryModal>("Add Entry", parameters);
+            ModalResult result = await formModal.Result;
+
+            if (result.Cancelled)
+            {
+                Console.WriteLine("Modal was cancelled");
+                return;
+            }
+
+            AttendanceEntryModel modalEntry = (AttendanceEntryModel)result.Data!;
+
+            if (modalEntry.CustomModalResult == CustomModalResult.Delete)
+            {
+                DeleteAttendanceEntryResponse deleteAttendanceEntryResponse = await this.AttendanceEntryService.DeleteAttendanceEntry(id);
+                
+                if (deleteAttendanceEntryResponse.Success == false)
+                {
+                    this.ToastService.ShowError(deleteAttendanceEntryResponse.Message!);
+                    return;
                 }
-
-                parameters.Add(nameof(AttendanceEntryModal.DateSelected),
-                    new DateTime(date.Year, date.Month, date.Day));
-
-                IModalReference formModal = Modal.Show<AttendanceEntryModal>("Add Entry", parameters);
-                ModalResult result = await formModal.Result;
-
-                if (result.Cancelled)
+                
+                GetEmployeeAttendanceEntriesResponse getEmployeeAttendanceEntriesResponse = await this.AttendanceEntryService.GetAttendanceEntries(this.SelectedEmployee.Id, this.SelectedYear);
+                
+                if (getEmployeeAttendanceEntriesResponse.Success == false)
                 {
-                    Console.WriteLine("Modal was cancelled");
+                    this.ToastService.ShowError(getEmployeeAttendanceEntriesResponse.Message!);
+                    return;
+                }
+                
+                this.ToastService.ShowSuccess(deleteAttendanceEntryResponse.Message!);
+                this.SelectedEmployee.AttendanceEntries = getEmployeeAttendanceEntriesResponse.AttendanceEntries!.ToList();
+            }
+            else if (modalEntry.CustomModalResult == CustomModalResult.Update && existingEntry != null)
+            {
+                existingEntry.Notes = modalEntry.Notes;
+                existingEntry.Category = modalEntry.Category;
+                existingEntry.Amount = modalEntry.Amount;
+                UpdateAttendanceEntryResponse updateAttendanceEntryResponse = await this.AttendanceEntryService.UpdateAttendanceEntry(existingEntry);
+
+                if (updateAttendanceEntryResponse.Success)
+                {
+                    this.ToastService.ShowSuccess("Entry Updated Successfully");
                 }
                 else
                 {
-                    AttendanceEntryModel modalEntry = (AttendanceEntryModel)result.Data!;
-
-                    if (modalEntry.InputDate == DateTime.MinValue)
-                    {
-                        await this.AttendanceEntryService.DeleteAttendanceEntry(id);
-                        this.SelectedEmployee.AttendanceEntries =
-                            (List<AttendanceEntryDto>)await this.AttendanceEntryService.GetAttendanceEntries(
-                                this.SelectedEmployee.Id, this.SelectedYear);
-                    }
-                    else if (existingEntry != null)
-                    {
-                        existingEntry.Notes = modalEntry.Notes;
-                        existingEntry.Category = modalEntry.Category;
-                        existingEntry.Amount = modalEntry.Amount;
-                        await this.AttendanceEntryService.UpdateAttendanceEntry(existingEntry);
-                    }
-                    else
-                    {
-                        modalEntry.EmployeeId = this.SelectedEmployee.Id;
-                        await this.AttendanceEntryService.AddAttendanceEntry(modalEntry);
-                        this.SelectedEmployee.AttendanceEntries =
-                            (List<AttendanceEntryDto>)await this.AttendanceEntryService.GetAttendanceEntries(
-                                this.SelectedEmployee.Id, this.SelectedYear);
-                    }
-
-                    UpdateEmployeeStatistics();
-                    ReCreateCalender();
+                    this.ToastService.ShowError(updateAttendanceEntryResponse.Message!);
                 }
             }
+            else
+            {
+                modalEntry.EmployeeId = this.SelectedEmployee.Id;
+                CreateAttendanceEntryResponse addAttendanceEntryResponse = await this.AttendanceEntryService.AddAttendanceEntry(modalEntry);
+                
+                if (addAttendanceEntryResponse.Success == false)
+                {
+                    this.ToastService.ShowError(addAttendanceEntryResponse.Message!);
+                    return;
+                }
+                
+                GetEmployeeAttendanceEntriesResponse getEmployeeAttendanceEntriesResponse = await this.AttendanceEntryService.GetAttendanceEntries(this.SelectedEmployee.Id, this.SelectedYear);
+                
+                if (getEmployeeAttendanceEntriesResponse.Success == false)
+                {
+                    this.ToastService.ShowError(getEmployeeAttendanceEntriesResponse.Message!);
+                    return;
+                }
+                
+                this.ToastService.ShowSuccess(addAttendanceEntryResponse.Message!);
+                this.SelectedEmployee.AttendanceEntries = getEmployeeAttendanceEntriesResponse.AttendanceEntries!.ToList();
+            }
+
+            UpdateEmployeeStatistics();
+            ReCreateCalender();
         }
     }
 }

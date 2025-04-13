@@ -54,14 +54,16 @@ namespace Charmaran.UI
         private static void AddRefitServices(this IServiceCollection services, IConfiguration configuration)
         {
             string apiEndpoint = configuration["ApiUrl"] ?? "http://localhost:5032";
+
+            RefitSettings refitSettings = new RefitSettings(new NewtonsoftJsonContentSerializer());
             
-            services.AddRefitClient<IEmployeeApiService>()
+            services.AddRefitClient<IEmployeeApiService>(refitSettings)
                 .ConfigureHttpClient(c =>
                 {
                     c.BaseAddress = new Uri(apiEndpoint);
                 }).AddHttpMessageHandler<AuthHeaderHandler>();
             
-            services.AddRefitClient<IAttendanceEntryApiService>()
+            services.AddRefitClient<IAttendanceEntryApiService>(refitSettings)
                 .ConfigureHttpClient(c =>
                 {
                     c.BaseAddress = new Uri(apiEndpoint);
